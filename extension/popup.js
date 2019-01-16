@@ -26,83 +26,65 @@ function DOMtoString(document_root) {
     return html;
 }
 
-
-
-/* chrome.runtime.onMessage.addListener(function(request, sender) {
-  if (request.action == "getSource") {
-    message.innerText = request.source;
-	//let req = XMLHttpRequest()
-	//req.open("POST", 127.0.0.1:8080)
-	//req.send(request.source)
-	console.log(request.source);
-  
-}) */
-
-
-
-function onWindowLoad() {
-	/* Get user ID and set if doesn't exist */
-	var my_user = 0;
+function GetID() {
+	/* Returns ID and sets new one if doesn't exist */
 	chrome.storage.local.get(['id'],
 	function(data)
 	{
 		if(chrome.runtime.lastError)
 		{
-			console.log("error");
-
-			return;
-		}
-		else
-		{
-			chrome.storage.local.set({'id': 1},
-			function()
-			{
-				if(chrome.runtime.lastError)
-				{
-					console.log("error");
-
-				}
-
-				console.log('Value is set to ' + value);
-				return;
-
-			}
-			);
+			chrome.storage.local.set({'id': 1});
 
 		}
 
     var bookNarration = parseInt(data.id);
-	my_user = data.id;
     console.log(data.id);
+	return data.id;
 	}
 	);
+	return data.id;
+
+	
+}
 
 
-  
-  
 
-/*   chrome.tabs.executeScript(null, {
-    file: "getPagesSource.js"
-  }, function() {
-    // If you try and inject into an extensions page or the webstore/NTP you'll get an error
-    if (chrome.runtime.lastError) {
-      message.innerText = 'There was an error injecting script : \n' + chrome.runtime.lastError.message;
-    }
-  });
- */
- 
-   var html_str = DOMtoString(document);
-   console.log(html_str);
+function onWindowLoad() {
+	var my_user = GetID();
+	console.log(my_user);
+	
+	var html_str = DOMtoString(document);
+	console.log(html_str);
    
-   var mySocket = new WebSocket("ws://127.0.0.1:8080");
+	var mySocket = new WebSocket("ws://127.0.0.1:8080");
+   
+	   // Fired when the connection has been established  
+	socket.onopen = function() {  
+		console.log('Connected to the server!');  
+	};  
+	  
+	// Fired when there is an error  
+	socket.onerror = function(error) {  
+		console.log('Error:', error);  
+	};  
+	  
+	// Fired when we receive a message from the server  
+	socket.onmessage = function(message) {  
+		console.log('Received:', message.data);  
+	};  
+	  
+	// Fired when the server has closed the connection  
+	socket.onclose = function() {  
+		console.log('Server disconnected');  
+	};  
+	  
+	// Send a message to the server  
+	socket.send("Hmmm.. I have nothing smart to say.");  
+	  
+	// Close the connection  
+	socket.close();  
+
    mySocket.send(html_str);
-/*    var req = new XMLHttpRequest();
-   req.open("POST", "http://localhost:8080", true);
-   xhr.setRequestHeader("Content-Type", "application/json");
-   JSON.stringify({"sender": data_id, "html": html_str});
-   req.send(html_str);
-   console.log(req);
- */
 }
 
 window.onload = onWindowLoad;
