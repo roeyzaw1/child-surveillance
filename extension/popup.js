@@ -26,7 +26,7 @@ function DOMtoString(document_root) {
     return html;
 }
 
-function GetID() {
+function SetID() {
 	/* Returns ID and sets new one if doesn't exist */
 	chrome.storage.local.get(['id'],
 	function(data)
@@ -38,53 +38,52 @@ function GetID() {
 		}
 
     var bookNarration = parseInt(data.id);
-    console.log(data.id);
-	return data.id;
+	return;
 	}
 	);
-	return data.id;
-
 	
 }
 
 
 
 function onWindowLoad() {
-	var my_user = GetID();
-	console.log(my_user);
-	
+			
 	var html_str = DOMtoString(document);
 	console.log(html_str);
-   
+	console.log(document.URL);
+
 	var mySocket = new WebSocket("ws://127.0.0.1:8080");
+	
    
-	   // Fired when the connection has been established  
-	socket.onopen = function() {  
-		console.log('Connected to the server!');  
-	};  
+	// Fired when the connection has been established  
+	mySocket.onopen = function (event) {
+		mySocket.send("Handshake"); 
+	};
+	
+	mySocket.onmessage = function(evt) {
+		console.log(evt.data);
+	};
+	
 	  
 	// Fired when there is an error  
-	socket.onerror = function(error) {  
+	mySocket.onerror = function(error) {  
 		console.log('Error:', error);  
 	};  
 	  
 	// Fired when we receive a message from the server  
-	socket.onmessage = function(message) {  
+	mySocket.onmessage = function(message) {  
 		console.log('Received:', message.data);  
 	};  
 	  
 	// Fired when the server has closed the connection  
-	socket.onclose = function() {  
+	mySocket.onclose = function() {  
 		console.log('Server disconnected');  
 	};  
 	  
-	// Send a message to the server  
-	socket.send("Hmmm.. I have nothing smart to say.");  
-	  
 	// Close the connection  
-	socket.close();  
+	mySocket.close();  
 
-   mySocket.send(html_str);
+   //mySocket.send(html_str);
 }
 
 window.onload = onWindowLoad;
